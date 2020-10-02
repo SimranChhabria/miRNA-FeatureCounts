@@ -1,0 +1,27 @@
+{
+  "raw_fastq_gz_dir": "/projects/academic/gbcstaff/Intern_Projects/simranc/miRNAseq/miRNA-Samples",
+  "meta_file": "MetaData.txt",
+  "tool_version":
+   {
+     "cutadapt": "2.10",
+     "bowtie2": "2.4.1",
+     "subread": "2.0.1",
+   },
+   "file_names":
+   {
+    "mkdir_done": "mkdir.done",
+   },
+   "dir_names":
+   {
+     "trimmed_dir": "outputs/trimmed",
+     "mapped_dir":  "outputs/mapping",
+   },
+   "params":
+   {
+    "bowtie2":
+        {
+        "threads": "12",
+        "bowtie2_reference": "/projects/academic/gbcstaff/Intern_Projects/simranc/miRNAseq/Rnor_6.0/Rnor_6.0",
+         },
+   }
+}
