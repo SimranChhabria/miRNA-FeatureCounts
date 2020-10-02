@@ -18,7 +18,7 @@ This is a python snakemake file which creates feature counts table for miRNA seq
 4) Try the dry run of the snakefile created to check any potential errors.
    snakemake -n -s Snakefile
   
-5)Launch all the jobs.  
+5) Launch all the jobs.  
 
 # Launching the jobs:
 snakemake --latency-wait 120 -p -j 100 -s Snakefile
