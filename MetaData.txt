@@ -1,0 +1,2 @@
+#SampleName	Adapter1	fastqfiles
+360157	AGATCGGAAGAGCACACGTC	360157_S21_L003_R1_001.fastq.gz
