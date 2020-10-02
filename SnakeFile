@@ -1,0 +1,56 @@
+import pandas as pd
+import os
+
+configfile: "config.json"
+localrules: all,mkdir
+
+df=pd.read_csv(config["meta_file"], sep='\t', header=0, index_col=0)
+sample_ids = list(df.index)
+df.index = sample_ids
+
+def get_pair_gz(sample_id):
+    dir = config["raw_fastq_gz_dir"]
+    return tuple(os.path.join(dir, df.loc[str(sample_id), x]) for x in('fastqfiles',))
+
+def get_adapter(sample_id):
+    return df.loc[sample_id]["Adapter1"]
+
+rule all:
+    input: 
+       expand("{dir}/{sample_id}.sam", dir= config["dir_names"]["mapped_dir"], sample_id= sample_ids)  
+    output:
+       feature_counts = "countfinal.txt"
+    params:
+       reference = "rno.gff3"
+    shell:
+       "featureCounts -T 12 -t miRNA -g Name -s 1 -M -a {params.reference} -o {output} {input} "
+
+rule mkdir:
+    output: touch(config["file_names"]["mkdir_done"])
+    params: dirs = list(config["dir_names"].values())
+    shell: "mkdir -p {params.dirs}"
+
+rule trimmed:
+    input:
+       rules.mkdir.output,     
+       read=lambda wildcards:get_pair_gz(wildcards.sample_id)
+    output:
+       file1 = config["dir_names"]["trimmed_dir"] + "/{sample_id}.trim.R1.fastq"
+    params:
+       adapter= lambda wildcards:get_adapter(wildcards.sample_id) 
+    shell:
+       "cutadapt  -a {params.adapter}  -o {output.file1}  {input.read}"
+
+rule bowtie2:
+      input:
+        p1=rules.trimmed.output.file1
+      output:
+        mapped_sam_file = config["dir_names"]["mapped_dir"]+"/{sample_id}.sam"
+      params:
+        threads = config["params"]["bowtie2"]["threads"],
+        reference = config["params"]["bowtie2"]["bowtie2_reference"]
+      shell: 
+        "bowtie2 --very-sensitive-local  -x {params.reference}  -q {input.p1} -S {output.mapped_sam_file}"     
+
+
+
